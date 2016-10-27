@@ -1,6 +1,6 @@
 beego patch
 ===
-This is a patch for the **beego version 1.5.2**
+This is a patch for the **beego version 1.7.1**
 
 ## statement
 The patch is used to add some filters for the json field of a postgresql, including:
