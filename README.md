@@ -34,11 +34,7 @@ func JsonFilterTest() {
 ```
 
 ## usage
-To apply the patch, clone the beego-1.5.2.patch to the 
-```
-$GOPATH/github.com/astaxie/orm/
-```
-, and just apply it:
+To apply the patch, clone the beego-1.5.2.patch to the ``` $GOPATH/github.com/astaxie/orm/ ``` , and just apply it:
 
 ```shell
 $ git apply beego-1.5.2.patch
@@ -47,30 +43,9 @@ $ git apply beego-1.5.2.patch
 ## how to add new filter support
 The gate of allowing only one argument is opened if the new filter starts with "json_", what we should do is to:
 
-1. simply modifying the 
-```
-operators
-``` 
-variable in 
-```
-db.go
-``` 
-(this can be treated as a flip, if a new filter is set to 
-```
-true
-``` 
-in the map, then the new filter is acceptable)
+1. simply modifying the ``` operators ``` variable in ``` db.go ``` (this can be treated as a flip, if a new filter is set to ``` true ``` in the map, then the new filter is acceptable)
 
-2. add a new filter map to the 
-variable
-```
-postgresOperators
-```
-in file
-```
-db_postgres.go
-```
-(this provides the real meaning of the new filter if it is accepted already)
+2. add a new filter map to the variable ``` postgresOperators ``` in file ``` db_postgres.go ``` (this provides the real meaning of the new filter if it is accepted already)
 
 ## more introduction
 [beego](https://beego.me/)
