@@ -1,0 +1,75 @@
+diff --git a/orm/db.go b/orm/db.go
+index 30d8ae4..8f053b5 100644
+--- a/orm/db.go
++++ b/orm/db.go
+@@ -60,6 +60,15 @@ var (
+ 		// "week_day":    true,
+ 		"isnull": true,
+ 		// "search":      true,
++
++		// for json or jsonb in postgresql
++		"json_contains": true,
++		"json_trav_gt":  true,
++		"json_trav_lt":  true,
++		"json_trav_gte": true,
++		"json_trav_lte": true,
++		"json_trav_eq":  true,
++		"json_trav_nq":  true,
+ 	}
+ )
+ 
+@@ -1129,8 +1138,16 @@ func (d *dbBase) GenerateOperatorSQL(mi *modelInfo, fi *fieldInfo, operator stri
+ 			panic(fmt.Errorf("operator `%s` need 2 args not %d", operator, len(params)))
+ 		}
+ 		sql = "BETWEEN ? AND ?"
++
++		/*
++			case "json_trav_gt":
++				if len(params) != 2 {
++					panic(fmt.Errorf("operator `%s` need 2 args not %d", operator, len(params)))
++				}
++				sql = "->> ? > ?"
++		*/
+ 	default:
+-		if len(params) > 1 {
++		if len(params) > 1 && !strings.HasPrefix(operator, "json_") {
+ 			panic(fmt.Errorf("operator `%s` need 1 args not %d", operator, len(params)))
+ 		}
+ 		sql = d.ins.OperatorSQL(operator)
+diff --git a/orm/db_postgres.go b/orm/db_postgres.go
+index e972c4a..b2c8721 100644
+--- a/orm/db_postgres.go
++++ b/orm/db_postgres.go
+@@ -35,6 +35,15 @@ var postgresOperators = map[string]string{
+ 	"endswith":    "LIKE ?",
+ 	"istartswith": "LIKE UPPER(?)",
+ 	"iendswith":   "LIKE UPPER(?)",
++
++	// for jsonb
++	"json_contains": "@> ?",
++	"json_trav_gt":  "->> ? > ?",
++	"json_trav_lt":  "->> ? < ?",
++	"json_trav_gte": "->> ? >= ?",
++	"json_trav_lte": "->> ? <= ?",
++	"json_trav_eq":  "->> ? = ?",
++	"json_trav_nq":  "->> ? != ?",
+ }
+ 
+ // postgresql column field types.
+diff --git a/orm/db_tables.go b/orm/db_tables.go
+index e4c74ac..718221a 100644
+--- a/orm/db_tables.go
++++ b/orm/db_tables.go
+@@ -372,6 +372,12 @@ func (t *dbTables) getCondSQL(cond *Condition, sub bool, tz *time.Location) (whe
+ 				operator = "exact"
+ 			}
+ 
++			if strings.HasPrefix(operator, "json_") {
++				if !(fi.fieldType == TypeJsonbField || fi.fieldType == TypeJSONField) {
++					panic(fmt.Errorf("%s can only applied to json or jsonb field", operator))
++				}
++			}
++
+ 			operSQL, args := t.base.GenerateOperatorSQL(mi, fi, operator, p.args, tz)
+ 
+ 			leftCol := fmt.Sprintf("%s.%s%s%s", index, Q, fi.column, Q)
