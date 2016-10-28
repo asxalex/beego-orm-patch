@@ -34,10 +34,10 @@ func JsonFilterTest() {
 ```
 
 ## usage
-To apply the patch, clone the beego-1.5.2.patch to the ``` $GOPATH/github.com/astaxie/orm/ ``` , and just apply it:
+To apply the patch, clone the beego-1.7.1.patch to the ``` $GOPATH/github.com/astaxie/orm/ ``` , and just apply it:
 
 ```shell
-$ git apply beego-1.5.2.patch
+$ git apply beego-1.7.1.patch
 ```
 
 ## how to add new filter support
